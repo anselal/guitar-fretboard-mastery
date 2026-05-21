@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guitar Fretboard Learner</title>
+    <style>
+        /* Modern CSS Variables for easy theme customization */
+        :root {
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --fretboard-bg: #fff;
+            --fretboard-border: #cbd5e1;
+
+            /* Note Colors */
+            --note-red: #ef4444;
+            /* Modern soft red */
+            --note-brown: #92400e;
+            /* Warm wood-like brown */
+            --note-text: #ffffff;
+            --label-bg: #f1f5f9;
+            --label-hover: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 30px 20px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 2rem;
+            letter-spacing: -0.025em;
+            text-align: center;
+        }
+
+        .instructions {
+            margin-bottom: 24px;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.5;
+            max-width: 600px;
+        }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--fretboard-border);
+            width: 100%;
+        }
+
+        button {
+            padding: 10px 24px;
+            cursor: pointer;
+            background-color: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #334155;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-btn {
+            background-color: var(--label-bg);
+            color: var(--text-main);
+            border: 1px solid var(--fretboard-border);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-btn:hover {
+            background-color: var(--label-hover);
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            background-color: var(--note-red);
+            color: white;
+            border-color: var(--note-red);
+        }
+
+        .scroll-hint {
+            display: none;
+            /* Managed by JavaScript now */
+            color: var(--text-main);
+            background-color: #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .fretboard-container {
+            width: 100%;
+            max-width: 100%;
+            /* Changed from 1400px to fully utilize 2K/4K screens */
+            overflow-x: auto;
+            background: var(--fretboard-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 5px;
+            /* Space for scrollbar */
+        }
+
+        /* Custom Scrollbar for better visibility */
+        .fretboard-container::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .fretboard-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .fretboard-container::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+            border: 2px solid #f1f5f9;
+        }
+
+        .fretboard-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .fretboard {
+            display: grid;
+            grid-template-columns: auto repeat(19, minmax(70px, 1fr));
+            border: 1px solid var(--fretboard-border);
+            border-radius: 12px;
+            overflow: hidden;
+            min-width: max-content;
+            /* Ensures the grid doesn't collapse too much */
+        }
+
+        /* Modifiers for 12-fret mode */
+        .fretboard.show-12-frets {
+            grid-template-columns: auto repeat(12, minmax(70px, 1fr));
+        }
+
+        .fretboard.show-12-frets .cell:nth-child(n+14) {
+            display: none !important;
+        }
+
+        .fretboard.show-12-frets .cell:nth-child(13) {
+            border-right: none;
+        }
+
+        .string-row {
+            display: contents;
+        }
+
+        .cell {
+            border-right: 1px solid var(--fretboard-border);
+            border-bottom: 1px solid var(--fretboard-border);
+            padding: 10px 6px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            min-height: 48px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cell:nth-child(20n) {
+            border-right: none;
+        }
+
+        .string-row:last-child .cell {
+            border-bottom: none;
+        }
+
+        .label-cell {
+            background-color: var(--label-bg);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            user-select: none;
+            justify-content: flex-start;
+            padding-left: 20px;
+            padding-right: 20px;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            box-shadow: 4px 0 8px rgba(0, 0, 0, 0.08);
+            /* Stronger shadow for scrolling */
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .label-cell:hover {
+            background-color: var(--label-hover);
+        }
+
+        .string-row.hidden .label-cell {
+            color: var(--text-muted);
+            text-decoration: line-through;
+            background-color: #f8fafc;
+        }
+
+        .note-natural {
+            background-color: var(--note-red);
+            color: var(--note-text);
+            font-weight: 600;
+        }
+
+        .note-empty {
+            background-color: var(--note-brown);
+        }
+
+        /* Flex containers for text inside cells */
+        .label-content,
+        .note-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            white-space: nowrap;
+        }
+
+        /* Hidden States */
+        .fretboard.filter-active .note-natural:not(.highlight-note) {
+            background-color: var(--note-brown);
+        }
+
+        .fretboard.filter-active .note-natural:not(.highlight-note) .note-content {
+            opacity: 0;
+            transform: scale(0.5);
+            pointer-events: none;
+        }
+
+        .string-row.hidden .note-natural {
+            background-color: var(--note-brown) !important;
+        }
+
+        .string-row.hidden .note-natural .note-content {
+            opacity: 0 !important;
+            transform: scale(0.5) !important;
+            pointer-events: none;
+        }
+
+        /* Marker Row */
+        .marker-row {
+            display: contents;
+        }
+
+        .marker-cell {
+            background-color: var(--bg-color);
+            flex-direction: column;
+            color: var(--text-muted);
+            padding: 8px 0;
+            border-bottom: none !important;
+        }
+
+        .marker-cell:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            box-shadow: 4px 0 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .dot {
+            font-size: 14px;
+            line-height: 1;
+            margin-bottom: 4px;
+            background-color: #cbd5e1;
+            color: #475569;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .dot.empty-dot {
+            background-color: transparent;
+            box-shadow: none;
+        }
+
+        .fret-num {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 1440px) {
+            .fretboard {
+                grid-template-columns: auto repeat(19, minmax(45px, 1fr));
+            }
+
+            .fretboard.show-12-frets {
+                grid-template-columns: auto repeat(12, minmax(45px, 1fr));
+            }
+
+            .cell {
+                padding: 8px 4px;
+                font-size: 14px;
+            }
+
+            .label-cell {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .sep {
+                display: none;
+            }
+
+            /* Hide the colon separator */
+
+            /* Stack English and Greek vertically to save horizontal space */
+            .label-content,
+            .note-content {
+                flex-direction: column;
+                gap: 2px;
+                line-height: 1.1;
+            }
+
+            .str-gr,
+            .note-gr {
+                font-size: 0.8em;
+                opacity: 0.9;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .fretboard {
+                grid-template-columns: auto repeat(19, minmax(38px, 1fr));
+            }
+
+            .fretboard.show-12-frets {
+                grid-template-columns: auto repeat(12, minmax(38px, 1fr));
+            }
+
+            .cell {
+                min-height: 42px;
+                padding: 6px 2px;
+            }
+
+            .label-cell {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .str-top {
+                display: flex;
+                gap: 4px;
+                font-size: 14px;
+            }
+
+            .note-en,
+            .str-en {
+                font-size: 13px;
+                font-weight: bold;
+            }
+
+            .note-gr,
+            .str-gr {
+                font-size: 10px;
+            }
+
+            .dot {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+            }
+
+            .fret-num {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Fretboard Master</h1>
+    <p class="instructions">
+        <strong>Click on any string label</strong> to hide or show its notes. <br>
+        <strong>Click on a note filter below</strong> to isolate specific notes across the board.
+    </p>
+
+    <div class="controls-container">
+        <div class="controls">
+            <button onclick="toggleAll(false)">Hide All Strings</button>
+            <button onclick="toggleAll(true)">Show All Strings</button>
+            <button id="toggle-fret-count-btn" onclick="toggleFretCount()">Show 12 Frets</button>
+        </div>
+
+        <div class="filter-controls" id="filter-controls">
+            <!-- Filter buttons injected by JS -->
+        </div>
+    </div>
+
+    <div class="scroll-hint" id="scroll-hint">👉 Swipe horizontally to view all frets</div>
+
+    <div class="fretboard-container" id="fretboard-container">
+        <div class="fretboard" id="fretboard">
+            <!-- Fretboard grid will be generated here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // 12-Tone Chromatic Scale
+        const chromaticScale = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        // Mapping of English to Greek Solfege
+        const greekMap = {
+            "C": "Ντο", "D": "Ρε", "E": "Μι", "F": "Φα", "G": "Σολ", "A": "Λα", "B": "Σι"
+        };
+
+        // Standard Guitar Tuning (from highest string 1 to lowest string 6)
+        const guitarStrings = [
+            { num: 1, openNote: "E" },
+            { num: 2, openNote: "B" },
+            { num: 3, openNote: "G" },
+            { num: 4, openNote: "D" },
+            { num: 5, openNote: "A" },
+            { num: 6, openNote: "E" }
+        ];
+
+        // Fret indices that have inlay markers (including 12, 15, 17, 19)
+        const markerFrets = [1, 3, 5, 7, 9, 12, 15, 17, 19];
+
+        // Natural notes for the filter
+        const naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
+        let activeFilterNote = null;
+        let is12FretMode = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fretboard = document.getElementById('fretboard');
+            const filterControls = document.getElementById('filter-controls');
+
+            // --- 0. Initialize Note Filters ---
+            naturalNotes.forEach(note => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.innerHTML = `${note} &nbsp; (${greekMap[note]})`;
+                btn.onclick = () => toggleFilter(note, btn);
+                filterControls.appendChild(btn);
+            });
+
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'filter-btn';
+            clearBtn.textContent = 'Clear Filters';
+            clearBtn.style.marginLeft = '8px';
+            clearBtn.onclick = clearFilters;
+            filterControls.appendChild(clearBtn);
+
+            // --- 1. Render String Rows ---
+            guitarStrings.forEach(string => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'string-row';
+
+                // First Column: Clickable String Label (Sticky)
+                const labelCell = document.createElement('div');
+                labelCell.className = 'cell label-cell';
+
+                // Structured HTML for responsive stacking
+                labelCell.innerHTML = `
+                    <div class="label-content">
+                        <span class="str-top">
+                            <span class="str-num">${string.num}</span>
+                            <span class="str-en">${string.openNote}</span>
+                        </span>
+                        <span class="sep">:</span>
+                        <span class="str-gr">${greekMap[string.openNote]}</span>
+                    </div>
+                `;
+
+                labelCell.addEventListener('click', () => {
+                    rowDiv.classList.toggle('hidden');
+                });
+                rowDiv.appendChild(labelCell);
+
+                // Frets 1 to 19
+                let currentNoteIndex = chromaticScale.indexOf(string.openNote);
+
+                for (let fret = 1; fret <= 19; fret++) {
+                    currentNoteIndex = (currentNoteIndex + 1) % 12;
+                    const currentNote = chromaticScale[currentNoteIndex];
+                    const isNatural = !currentNote.includes('#');
+
+                    const fretCell = document.createElement('div');
+                    fretCell.className = `cell ${isNatural ? 'note-natural' : 'note-empty'}`;
+
+                    if (isNatural) {
+                        fretCell.setAttribute('data-note', currentNote);
+                        // Structured HTML for responsive stacking
+                        fretCell.innerHTML = `
+                            <span class="note-content">
+                                <span class="note-en">${currentNote}</span>
+                                <span class="sep">:</span>
+                                <span class="note-gr">${greekMap[currentNote]}</span>
+                            </span>
+                        `;
+                    }
+                    rowDiv.appendChild(fretCell);
+                }
+
+                fretboard.appendChild(rowDiv);
+            });
+
+            // --- 2. Render Fret Markers Row (Bottom) ---
+            const markerRow = document.createElement('div');
+            markerRow.className = 'marker-row';
+
+            // Empty corner cell directly below the string labels (Sticky)
+            const cornerCell = document.createElement('div');
+            cornerCell.className = 'cell marker-cell';
+            markerRow.appendChild(cornerCell);
+
+            // Columns 1 to 19 markers
+            for (let fret = 1; fret <= 19; fret++) {
+                const markerCell = document.createElement('div');
+                markerCell.className = 'cell marker-cell';
+
+                const dot = document.createElement('div');
+                if (markerFrets.includes(fret)) {
+                    dot.className = 'dot';
+                    // Use double dots for the 12th fret, single for 15, 17, 19
+                    dot.innerHTML = fret === 12 ? '••' : '•';
+                } else {
+                    dot.className = 'dot empty-dot';
+                    dot.innerHTML = '&nbsp;';
+                }
+                markerCell.appendChild(dot);
+
+                const num = document.createElement('div');
+                num.className = 'fret-num';
+                num.textContent = fret;
+                markerCell.appendChild(num);
+
+                markerRow.appendChild(markerCell);
+            }
+            fretboard.appendChild(markerRow);
+
+            // Check visibility of the scroll hint on initial load
+            checkScrollHint();
+        });
+
+        // Function to dynamically show/hide the scroll hint based on actual overflow
+        function checkScrollHint() {
+            const container = document.getElementById('fretboard-container');
+            const hint = document.getElementById('scroll-hint');
+
+            // Add a small 2px buffer to avoid showing it for tiny sub-pixel rounding differences
+            if (container.scrollWidth > container.clientWidth + 2) {
+                hint.style.display = 'block';
+            } else {
+                hint.style.display = 'none';
+            }
+        }
+
+        // Check if the scroll hint needs to update when resizing the browser
+        window.addEventListener('resize', checkScrollHint);
+
+        function toggleAll(show) {
+            const rows = document.querySelectorAll('.string-row');
+            rows.forEach(row => {
+                if (show) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        function toggleFretCount() {
+            const fretboard = document.getElementById('fretboard');
+            const btn = document.getElementById('toggle-fret-count-btn');
+
+            is12FretMode = !is12FretMode;
+
+            if (is12FretMode) {
+                fretboard.classList.add('show-12-frets');
+                btn.textContent = 'Show 19 Frets';
+            } else {
+                fretboard.classList.remove('show-12-frets');
+                btn.textContent = 'Show 12 Frets';
+            }
+
+            // Give DOM a tiny moment to recalculate widths before checking the scroll hint
+            setTimeout(checkScrollHint, 50);
+        }
+
+        function toggleFilter(note, btnElement) {
+            const fretboard = document.getElementById('fretboard');
+            const allFilterBtns = document.querySelectorAll('.filter-btn');
+
+            allFilterBtns.forEach(btn => btn.classList.remove('active'));
+
+            if (activeFilterNote === note) {
+                clearFilters();
+                return;
+            }
+
+            activeFilterNote = note;
+            btnElement.classList.add('active');
+            fretboard.classList.add('filter-active');
+
+            const allNotes = document.querySelectorAll('.note-natural');
+            allNotes.forEach(cell => {
+                if (cell.getAttribute('data-note') === note) {
+                    cell.classList.add('highlight-note');
+                } else {
+                    cell.classList.remove('highlight-note');
+                }
+            });
+        }
+
+        function clearFilters() {
+            activeFilterNote = null;
+            const fretboard = document.getElementById('fretboard');
+
+            fretboard.classList.remove('filter-active');
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.querySelectorAll('.note-natural').forEach(cell => {
+                cell.classList.remove('highlight-note');
+            });
+        }
+    </script>
+</body>
+
+</html>
