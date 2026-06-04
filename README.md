@@ -12,6 +12,8 @@ This tool eliminates visual clutter by allowing users to isolate specific string
 
 * **Open String Highlighting:** When you filter for specific notes, the corresponding open string labels on the left will also illuminate, seamlessly connecting the open strings to your fretboard patterns.
 
+* **Dynamic Fret Sequence Cheatsheet:** Features a built-in reference table below the fretboard that maps out the exact sequence of frets for every note across all six strings. This cheatsheet syncs automatically with your active note filters and updates instantly when switching between the 12-fret and 19-fret views.
+
 * **Dynamic Fret Toggle:** Easily switch between a standard 12-fret view and an extended 19-fret view with a single click.
 
 * **Fully Responsive:** Intelligently adapts to any screen size. On mobile devices, notes stack vertically to save space, and a custom horizontal scrollbar ensures the entire neck is accessible.
