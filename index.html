@@ -129,6 +129,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
+        /* --- FRETBOARD STYLES --- */
         .fretboard-container {
             width: 100%;
             max-width: 100%;
@@ -140,21 +141,10 @@
             padding-bottom: 5px;
         }
 
-        .fretboard-container::-webkit-scrollbar {
-            height: 10px;
-        }
-        .fretboard-container::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 0 0 12px 12px;
-        }
-        .fretboard-container::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 10px;
-            border: 2px solid #f1f5f9;
-        }
-        .fretboard-container::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
+        .fretboard-container::-webkit-scrollbar { height: 10px; }
+        .fretboard-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 0 0 12px 12px; }
+        .fretboard-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; border: 2px solid #f1f5f9; }
+        .fretboard-container::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
         .fretboard {
             display: grid;
@@ -165,19 +155,11 @@
             min-width: max-content;
         }
         
-        .fretboard.show-12-frets {
-            grid-template-columns: auto repeat(12, minmax(70px, 1fr));
-        }
-        .fretboard.show-12-frets .cell:nth-child(n+14) {
-            display: none !important;
-        }
-        .fretboard.show-12-frets .cell:nth-child(13) {
-            border-right: none;
-        }
+        .fretboard.show-12-frets { grid-template-columns: auto repeat(12, minmax(70px, 1fr)); }
+        .fretboard.show-12-frets .cell:nth-child(n+14) { display: none !important; }
+        .fretboard.show-12-frets .cell:nth-child(13) { border-right: none; }
 
-        .string-row {
-            display: contents;
-        }
+        .string-row { display: contents; }
 
         .cell {
             border-right: 1px solid var(--fretboard-border);
@@ -211,17 +193,9 @@
             transition: background-color 0.2s, color 0.2s;
         }
 
-        .label-cell:hover {
-            background-color: var(--label-hover);
-        }
+        .label-cell:hover { background-color: var(--label-hover); }
+        .label-cell.highlight-label { background-color: var(--note-red); color: var(--note-text); }
 
-        /* Highlight State for Labels */
-        .label-cell.highlight-label {
-            background-color: var(--note-red);
-            color: var(--note-text);
-        }
-
-        /* Dim the label when the string is hidden, overriding highlights */
         .string-row.hidden .label-cell,
         .string-row.hidden .label-cell.highlight-label {
             color: var(--text-muted);
@@ -229,15 +203,8 @@
             background-color: #f8fafc;
         }
 
-        .note-natural {
-            background-color: var(--note-red);
-            color: var(--note-text);
-            font-weight: 600;
-        }
-
-        .note-empty {
-            background-color: var(--note-brown);
-        }
+        .note-natural { background-color: var(--note-red); color: var(--note-text); font-weight: 600; }
+        .note-empty { background-color: var(--note-brown); }
 
         .label-content, .note-content {
             display: flex;
@@ -248,23 +215,11 @@
             white-space: nowrap;
         }
 
-        .fretboard.filter-active .note-natural:not(.highlight-note) {
-            background-color: var(--note-brown);
-        }
-        .fretboard.filter-active .note-natural:not(.highlight-note) .note-content {
-            opacity: 0;
-            transform: scale(0.5);
-            pointer-events: none;
-        }
+        .fretboard.filter-active .note-natural:not(.highlight-note) { background-color: var(--note-brown); }
+        .fretboard.filter-active .note-natural:not(.highlight-note) .note-content { opacity: 0; transform: scale(0.5); pointer-events: none; }
 
-        .string-row.hidden .note-natural {
-            background-color: var(--note-brown) !important;
-        }
-        .string-row.hidden .note-natural .note-content {
-            opacity: 0 !important;
-            transform: scale(0.5) !important;
-            pointer-events: none;
-        }
+        .string-row.hidden .note-natural { background-color: var(--note-brown) !important; }
+        .string-row.hidden .note-natural .note-content { opacity: 0 !important; transform: scale(0.5) !important; pointer-events: none; }
 
         .marker-row { display: contents; }
         
@@ -299,73 +254,123 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .dot.empty-dot {
-            background-color: transparent;
-            box-shadow: none;
+        .dot.empty-dot { background-color: transparent; box-shadow: none; }
+        .fret-num { font-size: 13px; font-weight: 600; }
+
+        /* --- CHEATSHEET STYLES --- */
+        .cheatsheet-container {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 40px;
+            background: var(--fretboard-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .fret-num {
+        .cheatsheet-container h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        .cheatsheet-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px; /* Forces scroll on very small screens */
+        }
+
+        .cheatsheet-table th {
+            padding: 12px 8px;
+            color: var(--text-muted);
             font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--fretboard-border);
+        }
+
+        .cheatsheet-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .cheatsheet-table .note-col {
+            text-align: left;
+            font-weight: bold;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        .fret-val {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--label-bg);
+            border-radius: 6px;
             font-weight: 600;
+            color: var(--text-main);
+            font-size: 14px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        /* Cheatsheet Highlight State */
+        .cheatsheet-row { transition: background-color 0.2s ease; }
+        
+        .cheatsheet-row.highlight-row {
+            background-color: #fef2f2; /* extremely light red */
+        }
+        
+        .cheatsheet-row.highlight-row td {
+            border-bottom-color: #fee2e2;
+        }
+
+        .cheatsheet-row.highlight-row .fret-val {
+            background-color: var(--note-red);
+            color: white;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+        }
+
+        .cheatsheet-row.highlight-row .fret-val span {
+            color: #fca5a5 !important; /* Lighter red for the pipe separator */
         }
 
         @media (max-width: 1440px) {
-            .fretboard {
-                grid-template-columns: auto repeat(19, minmax(45px, 1fr));
-            }
-            .fretboard.show-12-frets {
-                grid-template-columns: auto repeat(12, minmax(45px, 1fr));
-            }
-            .cell {
-                padding: 8px 4px;
-                font-size: 14px;
-            }
-            .label-cell {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
+            .fretboard { grid-template-columns: auto repeat(19, minmax(45px, 1fr)); }
+            .fretboard.show-12-frets { grid-template-columns: auto repeat(12, minmax(45px, 1fr)); }
+            .cell { padding: 8px 4px; font-size: 14px; }
+            .label-cell { padding-left: 12px; padding-right: 12px; }
             .sep { display: none; } 
-            
-            .label-content, .note-content {
-                flex-direction: column;
-                gap: 2px;
-                line-height: 1.1;
-            }
-            .str-gr, .note-gr {
-                font-size: 0.8em;
-                opacity: 0.9;
-            }
+            .label-content, .note-content { flex-direction: column; gap: 2px; line-height: 1.1; }
+            .str-gr, .note-gr { font-size: 0.8em; opacity: 0.9; }
         }
 
         @media (max-width: 600px) {
             body { padding: 20px 10px; }
             h1 { font-size: 1.5rem; }
             button { padding: 8px 16px; font-size: 13px; }
-            
-            .fretboard {
-                grid-template-columns: auto repeat(19, minmax(38px, 1fr));
-            }
-            .fretboard.show-12-frets {
-                grid-template-columns: auto repeat(12, minmax(38px, 1fr));
-            }
-            .cell {
-                min-height: 42px;
-                padding: 6px 2px;
-            }
-            .label-cell {
-                padding-left: 8px;
-                padding-right: 8px;
-            }
-            .str-top {
-                display: flex;
-                gap: 4px;
-                font-size: 14px;
-            }
+            .fretboard { grid-template-columns: auto repeat(19, minmax(38px, 1fr)); }
+            .fretboard.show-12-frets { grid-template-columns: auto repeat(12, minmax(38px, 1fr)); }
+            .cell { min-height: 42px; padding: 6px 2px; }
+            .label-cell { padding-left: 8px; padding-right: 8px; }
+            .str-top { display: flex; gap: 4px; font-size: 14px; }
             .note-en, .str-en { font-size: 13px; font-weight: bold; }
             .note-gr, .str-gr { font-size: 10px; }
-            
             .dot { width: 18px; height: 18px; font-size: 10px; }
             .fret-num { font-size: 11px; }
+            
+            .cheatsheet-container { padding: 15px 10px; }
+            .cheatsheet-table th, .cheatsheet-table td { padding: 10px 4px; }
         }
     </style>
 </head>
@@ -397,6 +402,29 @@
         </div>
     </div>
 
+    <!-- NEW: Cheatsheet Section -->
+    <div class="cheatsheet-container">
+        <h3>Fret Sequence Cheatsheet (Strings 6 &rarr; 1)</h3>
+        <div class="table-responsive">
+            <table class="cheatsheet-table">
+                <thead>
+                    <tr>
+                        <th>Note</th>
+                        <th>Str 6 (E)</th>
+                        <th>Str 5 (A)</th>
+                        <th>Str 4 (D)</th>
+                        <th>Str 3 (G)</th>
+                        <th>Str 2 (B)</th>
+                        <th>Str 1 (E)</th>
+                    </tr>
+                </thead>
+                <tbody id="cheatsheet-body">
+                    <!-- Dynamic rows injected here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <script>
         const chromaticScale = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
         
@@ -425,6 +453,7 @@
             const fretboard = document.getElementById('fretboard');
             const filterControls = document.getElementById('filter-controls');
 
+            // 0. Initialize Note Filters
             naturalNotes.forEach(note => {
                 const btn = document.createElement('button');
                 btn.className = 'filter-btn';
@@ -440,16 +469,14 @@
             clearBtn.onclick = clearFilters;
             filterControls.appendChild(clearBtn);
 
+            // 1. Render String Rows
             guitarStrings.forEach(string => {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'string-row';
 
                 const labelCell = document.createElement('div');
                 labelCell.className = 'cell label-cell';
-                
-                // Add the data attribute to the label for filtering
                 labelCell.setAttribute('data-label-note', string.openNote);
-                
                 labelCell.innerHTML = `
                     <div class="label-content">
                         <span class="str-top">
@@ -488,13 +515,12 @@
                     }
                     rowDiv.appendChild(fretCell);
                 }
-                
                 fretboard.appendChild(rowDiv);
             });
 
+            // 2. Render Fret Markers Row
             const markerRow = document.createElement('div');
             markerRow.className = 'marker-row';
-
             const cornerCell = document.createElement('div');
             cornerCell.className = 'cell marker-cell';
             markerRow.appendChild(cornerCell);
@@ -517,13 +543,66 @@
                 num.className = 'fret-num';
                 num.textContent = fret;
                 markerCell.appendChild(num);
-
                 markerRow.appendChild(markerCell);
             }
             fretboard.appendChild(markerRow);
             
+            // 3. Generate the Initial Cheatsheet (19 Frets)
+            generateCheatsheet(19);
+            
             checkScrollHint();
         });
+
+        // Function to dynamically build the Cheatsheet table
+        function generateCheatsheet(maxFrets) {
+            const tbody = document.getElementById('cheatsheet-body');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            naturalNotes.forEach(note => {
+                const tr = document.createElement('tr');
+                tr.className = 'cheatsheet-row';
+                tr.setAttribute('data-note', note);
+
+                // Left Column: Note Name
+                const tdNote = document.createElement('td');
+                tdNote.className = 'note-col';
+                tdNote.innerHTML = `${note} <span style="font-size: 0.85em; color: var(--text-muted); font-weight: normal;">(${greekMap[note]})</span>`;
+                tr.appendChild(tdNote);
+
+                // Iterate strings from 6 down to 1
+                for (let i = guitarStrings.length - 1; i >= 0; i--) {
+                    const string = guitarStrings[i];
+                    let fretsOnString = [];
+                    let currentNoteIndex = chromaticScale.indexOf(string.openNote);
+                    
+                    // Find matching frets for this string up to maxFrets
+                    for (let fret = 1; fret <= maxFrets; fret++) {
+                        currentNoteIndex = (currentNoteIndex + 1) % 12;
+                        if (chromaticScale[currentNoteIndex] === note) {
+                            fretsOnString.push(fret);
+                        }
+                    }
+                    
+                    // Create cell
+                    const tdFret = document.createElement('td');
+                    if (fretsOnString.length > 0) {
+                        // Join with a stylized | separator
+                        tdFret.innerHTML = `<span class="fret-val">${fretsOnString.join('<span style="color:#cbd5e1; margin: 0 4px;">|</span>')}</span>`;
+                    } else {
+                        // Fallback if no natural note on this string (very rare, mostly for short fret lengths)
+                        tdFret.innerHTML = `<span class="fret-val" style="opacity: 0.3;">-</span>`;
+                    }
+                    tr.appendChild(tdFret);
+                }
+                
+                // Keep highlights if the note is already selected
+                if (activeFilterNotes.has(note)) {
+                    tr.classList.add('highlight-row');
+                }
+
+                tbody.appendChild(tr);
+            });
+        }
 
         function checkScrollHint() {
             const container = document.getElementById('fretboard-container');
@@ -558,9 +637,11 @@
             if (is12FretMode) {
                 fretboard.classList.add('show-12-frets');
                 btn.textContent = 'Show 19 Frets';
+                generateCheatsheet(12); // Update cheatsheet to 12 frets
             } else {
                 fretboard.classList.remove('show-12-frets');
                 btn.textContent = 'Show 12 Frets';
+                generateCheatsheet(19); // Update cheatsheet to 19 frets
             }
             
             setTimeout(checkScrollHint, 50);
@@ -604,6 +685,16 @@
                     cell.classList.remove('highlight-label');
                 }
             });
+
+            // Highlight matching Cheatsheet rows
+            const allCheatsheetRows = document.querySelectorAll('.cheatsheet-row');
+            allCheatsheetRows.forEach(row => {
+                if (activeFilterNotes.has(row.getAttribute('data-note'))) {
+                    row.classList.add('highlight-row');
+                } else {
+                    row.classList.remove('highlight-row');
+                }
+            });
         }
 
         function clearFilters() {
@@ -622,6 +713,10 @@
 
             document.querySelectorAll('.label-cell').forEach(cell => {
                 cell.classList.remove('highlight-label');
+            });
+
+            document.querySelectorAll('.cheatsheet-row').forEach(row => {
+                row.classList.remove('highlight-row');
             });
         }
     </script>
