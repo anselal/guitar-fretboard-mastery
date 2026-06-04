@@ -215,7 +215,7 @@
             background-color: var(--label-hover);
         }
 
-        /* New Highlight State for Labels */
+        /* Highlight State for Labels */
         .label-cell.highlight-label {
             background-color: var(--note-red);
             color: var(--note-text);
@@ -374,7 +374,7 @@
     <h1>Fretboard Master</h1>
     <p class="instructions">
         <strong>Click on any string label</strong> to hide or show its notes. <br>
-        <strong>Click on a note filter below</strong> to isolate specific notes across the board.
+        <strong>Click on note filters below</strong> to isolate specific notes (you can select multiple!).
     </p>
 
     <div class="controls-container">
@@ -385,14 +385,16 @@
         </div>
         
         <div class="filter-controls" id="filter-controls">
-            </div>
+            <!-- Filter buttons injected by JS -->
+        </div>
     </div>
 
     <div class="scroll-hint" id="scroll-hint">👉 Swipe horizontally to view all frets</div>
 
     <div class="fretboard-container" id="fretboard-container">
         <div class="fretboard" id="fretboard">
-            </div>
+            <!-- Fretboard grid will be generated here by JavaScript -->
+        </div>
     </div>
 
     <script>
@@ -414,7 +416,9 @@
         const markerFrets = [1, 3, 5, 7, 9, 12, 15, 17, 19];
         
         const naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
-        let activeFilterNote = null;
+        
+        // Track multiple selected notes using a Set
+        let activeFilterNotes = new Set();
         let is12FretMode = false;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -564,23 +568,27 @@
 
         function toggleFilter(note, btnElement) {
             const fretboard = document.getElementById('fretboard');
-            const allFilterBtns = document.querySelectorAll('.filter-btn');
-            
-            allFilterBtns.forEach(btn => btn.classList.remove('active'));
 
-            if (activeFilterNote === note) {
-                clearFilters();
-                return;
+            // Add or remove note from the Set
+            if (activeFilterNotes.has(note)) {
+                activeFilterNotes.delete(note);
+                btnElement.classList.remove('active');
+            } else {
+                activeFilterNotes.add(note);
+                btnElement.classList.add('active');
             }
 
-            activeFilterNote = note;
-            btnElement.classList.add('active');
-            fretboard.classList.add('filter-active');
+            // Apply filter active class if we have at least one note selected
+            if (activeFilterNotes.size > 0) {
+                fretboard.classList.add('filter-active');
+            } else {
+                fretboard.classList.remove('filter-active');
+            }
 
             // Highlight matching notes on the frets
             const allNotes = document.querySelectorAll('.note-natural');
             allNotes.forEach(cell => {
-                if (cell.getAttribute('data-note') === note) {
+                if (activeFilterNotes.has(cell.getAttribute('data-note'))) {
                     cell.classList.add('highlight-note');
                 } else {
                     cell.classList.remove('highlight-note');
@@ -590,7 +598,7 @@
             // Highlight matching string labels (open notes)
             const allLabels = document.querySelectorAll('.label-cell');
             allLabels.forEach(cell => {
-                if (cell.getAttribute('data-label-note') === note) {
+                if (activeFilterNotes.has(cell.getAttribute('data-label-note'))) {
                     cell.classList.add('highlight-label');
                 } else {
                     cell.classList.remove('highlight-label');
@@ -599,7 +607,7 @@
         }
 
         function clearFilters() {
-            activeFilterNote = null;
+            activeFilterNotes.clear();
             const fretboard = document.getElementById('fretboard');
             
             fretboard.classList.remove('filter-active');
