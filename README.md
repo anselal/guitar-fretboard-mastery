@@ -1,14 +1,16 @@
-# Guitar Fret Mastery 🎸
+# Guitar Fretboard Mastery 🎸
 
 An interactive, responsive, and completely self-contained single-file HTML application designed to help guitarists memorize the fretboard efficiently.
 
-This tool eliminates visual clutter by allowing users to isolate specific strings, highlight individual notes across the neck, and toggle between standard 12-fret and extended 19-fret views. It includes both English (C, D, E) and Greek (Ντο, Ρε, Μι) solfege notation.
+This tool eliminates visual clutter by allowing users to isolate specific strings, highlight individual notes (or multiple notes simultaneously) across the neck, and toggle between standard 12-fret and extended 19-fret views. It includes both English (C, D, E) and Greek (Ντο, Ρε, Μι) solfege notation.
 
 ## ✨ Features
 
 * **String Isolation:** Click on any string label (e.g., `1 E`) to instantly hide its notes. Perfect for practicing and memorizing one string at a time without distractions.
 
-* **Global Note Filtering:** Click on any of the natural note buttons (C, D, E, F, G, A, B) to highlight all occurrences of that note across the entire fretboard.
+* **Multiple Note Filtering:** Click on any of the natural note buttons (C, D, E, F, G, A, B) to highlight all occurrences across the entire fretboard. You can select multiple notes at the same time to easily visualize scales (e.g., pentatonic shapes) or chords (e.g., C Major: C, E, G).
+
+* **Open String Highlighting:** When you filter for specific notes, the corresponding open string labels on the left will also illuminate, seamlessly connecting the open strings to your fretboard patterns.
 
 * **Dynamic Fret Toggle:** Easily switch between a standard 12-fret view and an extended 19-fret view with a single click.
 
